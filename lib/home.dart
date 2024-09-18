@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:examen1_rrsa/utils/constantes.dart' as con;
 
@@ -39,10 +40,10 @@ class _HomeState extends State<Home> {
                         borderRadius: BorderRadius.circular(15),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.redAccent.withOpacity(0.4), // Color del resplandor
-                            spreadRadius: 5, // Extensión del resplandor
-                            blurRadius: 15, // Borrosidad del resplandor
-                            offset: const Offset(0, 0), // Posición de la sombra
+                            color: Colors.redAccent.withOpacity(0.4),
+                            spreadRadius: 5,
+                            blurRadius: 15, 
+                            offset: const Offset(0, 0),
                           ),
                         ],
                       ),
@@ -69,24 +70,37 @@ class _HomeState extends State<Home> {
                       itemBuilder: (BuildContext context, int index){
                         ///Area de construcción NO PASAR
 
-                        ///Tipo dinamico o que se adapta al valor que se asigna
-                        ///datos = [1, Text1, textN1, 101]
                         var datos = lista[index].toString().split('#'); ///$ -> NO USAR
 
-                        return Column(
+                        return (int.parse(datos[0]) % 2 == 0) ? Column(
                           children: [
-                              createdCard(
+                            createdCard(
                                 edad: datos[1],
-                              dia: datos[2],
-                              mes: datos[3],
-                              nombre: datos[4],
-                              apellido: datos[5],
-                              descripcion: datos[6],
-                              num: datos[7],
-                              id: datos[0],
+                                dia: datos[2],
+                                mes: datos[3],
+                                nombre: datos[4],
+                                apellido: datos[5],
+                                descripcion: datos[6],
+                                num: datos[7],
+                                id: datos[0],
                                 context: context,
+                              ),
+                              const SizedBox(height: 10),
+                          ],
+                        ) :  Column(
+                              children: [
+                                createdCard2(
+                                datos[1],
+                                datos[2],
+                                datos[3],
+                                datos[4],
+                                datos[5],
+                                datos[6],
+                                datos[7],
+                                datos[0],
+                                  index
                             ),
-                            const SizedBox(height: 10), // Ajusta el espacio entre las tarjetas aquí
+                            const SizedBox(height: 10),
                           ],
                         );
                       }
@@ -120,11 +134,167 @@ class _HomeState extends State<Home> {
       ),
     );
   }
+  InkWell createdCard2(String edad, String dia, String mes, String nombre,
+      String apellido, String descripcion, String num, String id, int index) {
+    return InkWell(
+      onTap: () {
+        showSnackBar(
+            'ID: $id '
+                '\nFecha de nacimiento: $dia de $mes'
+                '\nNombre completo: $nombre $apellido'
+                '\nNo. Estrellas: $num',
+            10,
+        );
+      },
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 3,
+            child: Container(
+              padding: const EdgeInsets.all(20.0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20.0),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 10, // 80%
+                        child: Text(
+                          '$dia - $mes',
+                          style: const TextStyle(
+                            fontSize: 28,
+                            color: con.fondo,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 1, // 10%
+                        child: Icon(
+                          (id == '10' || id == '15') ? Icons.add_alert_rounded : Icons.edit,
+                          color: (id == '10' || id == '15') ? Colors.amber : Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 5,
+                        child: Text(
+                          '$nombre $apellido',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 5,
+                        child: Text(
+                          descripcion,
+                          style: const TextStyle(color: Colors.grey),
+                        ),
+                      )
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: List.generate(5, (index) => Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 1.0),
+                      child: Icon(
+                        Icons.star,
+                        color: index < int.parse(num) ? Colors.amber : Colors.grey,
+                      ),
+                    )),
+                  )
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(width: 10),
+          Expanded(
+            flex: 2,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 45.0),
+              child: Center(
+                child: Container(
+                  width: 150,
+                  padding: const EdgeInsets.all(10.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
+                  child: Center(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (![10, 15, 20].contains(int.parse(id))) {
+                          setState(() {
+                            lista.removeAt(index);
+                            showSnackBar('Se eliminó el elemento $id', 15);
+                            if (kDebugMode) {
+                              print("Fue presionado el botón de eliminar id: $id");
+                            }
+                          });
+                        } else {
+                          showSnackBar('No se puede eliminar el elemento con ID: $id', 15);
+                          if (kDebugMode) {
+                            print("Intento de eliminar elemento con ID prohibido: $id");
+                          }
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.delete, color: Colors.white),
+                          SizedBox(width: 1),
+                          Text(
+                            'Borrar',
+                            style: TextStyle(color: Colors.white, fontSize: 16),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  void showSnackBar(String texto, int duracion){
+    final snack = SnackBar(
+      content: Text(texto),
+      duration: Duration(seconds: duracion),
+      action: SnackBarAction(
+        onPressed: () {
+          //Cualquier acción al dar clic sobre el widget
+        },
+        label: 'Cerrar',
+      ),
+    );
+
+    ///Muestra el mensaje en pantalla
+    ScaffoldMessenger.of(context).showSnackBar(snack);
+  }
 }
 
-
-
-///Clase para crear widgets  o creador de widgets sin estado
 class createdCard extends StatelessWidget {
   final String dia;
   final String num;
@@ -148,9 +318,9 @@ class createdCard extends StatelessWidget {
       onTap: () {
         showSnackBar(
             'ID: $id '
-            '\nFecha de nacimiento: $dia de $mes'
-            '\nNombre completo: $nombre $apellido'
-            '\nNo. Estrellas: $num',
+                '\nFecha de nacimiento: $dia de $mes'
+                '\nNombre completo: $nombre $apellido'
+                '\nNo. Estrellas: $num',
             10
         );
       },
@@ -169,7 +339,7 @@ class createdCard extends StatelessWidget {
                   flex: 10, // 80%
                   child: Text(
                     '$dia - $mes',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 28,
                       color: con.fondo,
                       fontWeight: FontWeight.w600,
@@ -186,14 +356,14 @@ class createdCard extends StatelessWidget {
 
               ],
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Row(
               children: [
                 Expanded(
                   flex: 5,
                   child: Text(
                     '$nombre $apellido',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -206,8 +376,8 @@ class createdCard extends StatelessWidget {
                   flex: 5,
                   child: Text(
                     descripcion,
-                    style: TextStyle(
-                      color: Colors.grey
+                    style: const TextStyle(
+                        color: Colors.grey
                     ),
                   ),
                 )
@@ -246,4 +416,6 @@ class createdCard extends StatelessWidget {
     ScaffoldMessenger.of(context).showSnackBar(snack);
   }
 }
+
+
 
