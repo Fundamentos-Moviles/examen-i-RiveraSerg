@@ -9,6 +9,8 @@ const botones = Color(0xffdc0000);
 const efectos = Color(0xff9b0202);
 
 
+
+
 const List listaExamen = [
   ///‘id # edad # dia de cumpleaños # mes de cumpleaños # Nombre # apellidos # descripción # num de estrellas en gris
   '10#25#15#7#Alice#Smith#Ingeniera en software#3',
